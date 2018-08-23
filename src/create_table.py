@@ -11,15 +11,15 @@ def create_table_psql(tsql):
     """
 
     # replace 'dbo' with 'public'
-    tsql = re.sub(r'dbo', 'public', tsql, re.M)
+    tsql = re.sub(r'dbo', 'public', tsql, re.M|re.DOTALL)
 
     # remove square brackets
-    tsql = re.sub(r'\[|\]','',tsql, re.M)
+    tsql = re.sub(r'\[|\]','',tsql, re.M|re.DOTALL)
 
     # convert types
-    tsql = re.sub(r'nchar', 'char', tsql, re.M)
-    tsql = re.sub(r'nvarchar', 'varchar', tsql, re.M)
-    tsql = re.sub(r'ntext', 'text', tsql, re.M)
-    tsql = re.sub(r'datetime', 'date', tsql, re.M)
+    tsql = re.sub(r'nchar', 'char', tsql, re.M|re.DOTALL)
+    tsql = re.sub(r'nvarchar', 'varchar', tsql, re.M|re.DOTALL)
+    tsql = re.sub(r'ntext', 'text', tsql, re.M|re.DOTALL)
+    tsql = re.sub(r'datetime', 'date', tsql, re.M|re.DOTALL)
 
     return tsql
