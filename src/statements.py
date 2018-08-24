@@ -1,27 +1,33 @@
 from re import compile, VERBOSE, IGNORECASE
 
+# This pattern is used to detect the beginning of SQL statements
+statement_start = \
+    compile(
+        r'''
+            ^\s*(?:           # Looking at the beginning of the string (except skipping any whitespace)
+            SET               # for any of these keywords
+           |CREATE\s+TABLE
+           |ALTER\s+TABLE
+           |INSERT
+           |GO
+           )\b                # Making sure a word ends here (so, for instance, `GOES` won't match)
+        ''',
+        IGNORECASE | VERBOSE  # ignoring case, whitespace, and comments
+    )
+
 
 def sql_statements(tsql_file):
     """
     A generator that yields SQL statements from the input file one by one
 
+    **Example:**
+        ``for stmt in sql_statements('<path>/<filename>.sql'):``
+            ``print(stmt)``
+
     :param tsql_file: the path to the input file
     :type tsql_file: str
     """
-
-    # This pattern is used to detect the beginning of SQL statements
-    statement_start = \
-        compile(
-            r'''
-                ^\s*(?:
-                SET
-               |CREATE\s+TABLE
-               |ALTER\s+TABLE
-               |INSERT
-               |GO)\b
-            ''',
-            IGNORECASE | VERBOSE
-        )
+    global statement_start
 
     statement = ''
     with open(tsql_file) as f:
@@ -38,7 +44,7 @@ def sql_statements(tsql_file):
                     statement = ''
 
                 if line.strip() == 'GO':
-                    yield ';'
+                    yield 'GO'
                 else:
                     statement += line
 
@@ -46,13 +52,6 @@ def sql_statements(tsql_file):
     stmt = statement.strip()
     if stmt:
         if stmt == 'GO':
-            yield ';'
+            yield 'GO'
         else:
             yield statement.strip('\n')
-
-
-# A small test
-if __name__ == '__main__':
-    for w in sql_statements('../initial__scripts/test.sql'):
-        print(w)
-        print('------- end of statement -------')
