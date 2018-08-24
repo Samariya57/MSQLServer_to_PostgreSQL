@@ -1,9 +1,9 @@
-import re
+from re import compile, VERBOSE, IGNORECASE, MULTILINE
 
 # The T-SQL SET commands and their equivalents in Postgres
 # These regular expressions are compiled later on with the re.X (== re.VERBOSE) flag set,
 # so the whitespace and text after the # sign are ignored
-substitutions = {
+subs = {
     # Keeping the regex version of these substitutions in case the logic gets more complicated
     #
     # r"""               # The outermost parentheses capture the entire line
@@ -78,7 +78,7 @@ def replace_identity_insert(match):
 # The regular expressions are compiled with the following flags:
 #   re.I - ignore case
 #   re.X - verbose - ignore whitespace and comments
-compiled_subs = [(re.compile(k, re.I | re.X), substitutions[k]) for k in substitutions]
+compiled_subs = [(compile(pattern, IGNORECASE | VERBOSE | MULTILINE), subs[pattern]) for pattern in subs]
 
 
 def set_psql(tsql):
@@ -102,4 +102,4 @@ def set_psql(tsql):
             return regex.sub(replacement, parameters)
 
     # By default, just comment out the line adding the note that it came from T-SQL
-    return '-- (from T-SQL) SET ' + parameters + ';'
+    return '-- (from T-SQL) SET ' + parameters.replace('\n', '\n--              ') + ';'

@@ -9,6 +9,9 @@ import set
 
 def test_set():
     assert set.set_psql('set NOCOUNT ON') == '-- (from T-SQL) SET NOCOUNT ON;'
+    assert set.set_psql('set NOCOUNT\nON') == \
+        "-- (from T-SQL) SET NOCOUNT\n" + \
+        "--              ON;"
     assert set.set_psql('SET NOCOUNT OFF') == '-- (from T-SQL) SET NOCOUNT OFF;'
     assert set.set_psql('SET ansi_NULLS ON') == '-- (from T-SQL) SET ansi_NULLS ON;'
     assert set.set_psql('set ANSI_NULLS OFF') == '-- (from T-SQL) SET ANSI_NULLS OFF;'
